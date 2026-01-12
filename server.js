@@ -3,8 +3,10 @@ const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
 const path = require('path');
 const config = require('./config/env');
+const { pool } = require('./db/database');
 
 // Import routes
 const authRoutes = require('./auth/spotify-auth');
@@ -47,6 +49,11 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 // Session configuration
 app.use(session({
+    store: new pgSession({
+        pool: pool,                            // Use existing PostgreSQL pool
+        tableName: 'session',                  // Table name for sessions
+        createTableIfMissing: true             // Auto-create session table
+    }),
     secret: config.server.sessionSecret,
     resave: false,
     saveUninitialized: false,

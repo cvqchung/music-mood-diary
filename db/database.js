@@ -243,12 +243,15 @@ function saveOnboardingRequest(name, email, callback) {
 }
 
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    pool.end(() => {
-        console.log('PostgreSQL pool has ended');
+// Graceful shutdown - only enable in production
+// In development, avoid premature pool closure during hot reloads
+if (config.env === 'production') {
+    process.on('SIGTERM', () => {
+        pool.end(() => {
+            console.log('PostgreSQL pool has ended');
+        });
     });
-});
+}
 
 
 module.exports = {
