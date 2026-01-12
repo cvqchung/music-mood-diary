@@ -100,11 +100,17 @@ router.get('/callback', function(req, res) {
                     // Store both Spotify user ID and database user ID in session
                     req.session.spotify_user_id = spotify_user_id;
                     req.session.db_user_id = userId;
+
+                    console.log('Saving session for user:', spotify_user_id, 'with session ID:', req.sessionID);
+
                     req.session.save(function(saveErr) {
                         if (saveErr) {
                             console.error('Session save error:', saveErr);
+                            res.redirect('/#error=session_save_failed');
+                        } else {
+                            console.log('Session saved successfully, redirecting...');
+                            res.redirect('/#success=true');
                         }
-                        res.redirect('/#success=true');
                     });
                 }
             });
@@ -121,6 +127,7 @@ router.get('/callback', function(req, res) {
  * Check if user is authenticated
  */
 router.get('/api/auth-status', function(req, res) {
+    console.log('Auth status check - Session ID:', req.sessionID, 'User ID:', req.session.spotify_user_id);
     const isLoggedIn = req.session.spotify_user_id ? true : false;
     res.json({
         isLoggedIn: isLoggedIn,
@@ -166,7 +173,7 @@ router.get('/logout', function(req, res) {
             console.error('Error destroying session:', err);
         }
 
-        res.clearCookie('connect.sid');     // Clear session cookie
+        res.clearCookie('sessionId');       // Clear session cookie
         res.redirect('/');                  // Redirect to home
     });
 });
