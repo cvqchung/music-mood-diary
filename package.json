@@ -1,0 +1,40 @@
+{
+  "name": "music-mood-diary",
+  "version": "1.0.0",
+  "description": "AI-powered music mood diary that analyzes your Spotify listening history",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "spotify",
+    "ai",
+    "mood-tracking",
+    "music-analysis",
+    "anthropic",
+    "claude-ai",
+    "express",
+    "postgresql"
+  ],
+  "author": "Cynthia Chung <cynthiacgq@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cvqchung/music-mood-diary.git"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "axios": "^1.7.9",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "helmet": "^8.0.0",
+    "pg": "^8.16.3"
+  }
+}

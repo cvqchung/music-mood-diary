@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Music Mood Diary</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎶</text></svg>">
+  <style>
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .logout-btn {
+      background-color: #c75450;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .logout-btn:hover {
+      background-color: #b44540;
+    }
+    .history-snippet:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .history-snippet.active {
+      border-color: #1DB954 !important;
+      border-width: 2px !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-container">
+    <h1>🎵 Music Mood Diary</h1>
+    <button id="logout-btn" class="logout-btn" style="display: none;">Logout</button>
+  </div>
+
+  <div id="login-section">
+    <div class="info" style="margin-bottom: 20px;">
+      <p><strong>ℹ️ About This Project</strong></p>
+      <p>This is a personal project using the Spotify Web API in Development Mode. Due to Spotify's restrictions, I need to manually authorize each user in the Spotify Developer Dashboard (max 25 users).</p>
+      <p>To request access, please fill out the form below with your name and email. I'll add you to the allowlist.</p>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 30px;">
+      <div style="flex: 1; padding-right: 20px;">
+        <h3 style="margin-top: 0;">Request Access</h3>
+        <form id="onboarding-form" style="display: flex; flex-direction: column; gap: 15px;">
+          <div>
+            <label for="name" style="display: block; margin-bottom: 5px; font-weight: 500;">Name:</label>
+            <input type="text" id="name" name="name" required style="width: 85%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+          </div>
+          <div>
+            <label for="email" style="display: block; margin-bottom: 5px; font-weight: 500;">Email (must match your Spotify account):</label>
+            <input type="email" id="email" name="email" required style="width: 85%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+          </div>
+          <div style="text-align: center;">
+            <button type="submit" style="background: #1DB954; color: white; padding: 10px 30px; border: none; border-radius: 20px; cursor: pointer; font-size: 14px;">
+              Submit Request
+            </button>
+          </div>
+        </form>
+        <div id="onboarding-message" style="margin-top: 15px;"></div>
+      </div>
+
+      <div style="border-left: 2px solid #ddd;"></div>
+
+      <div style="flex: 0 0 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+        <p style="margin-bottom: 15px; color: #666; font-weight: 500;">Already authorized?</p>
+        <button type="button" id="spotify-login-btn">Login with Spotify</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="logged-in-section" style="display: none;">
+    <p class="success" id="user-info"></p>
+  </div>
+
+  <div id="message"></div>
+
+  <div id="mood-section" style="display: none;">
+    <div class="test-section">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <h2 style="margin: 0;">🎵 Music Mood Analysis</h2>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+            <button id="refresh-mood-btn">Refresh Analysis</button>
+            <div id="mood-status" style="font-size: 16px; min-height: 24px;"></div>
+          </div>
+        </div>
+
+        <div id="mood-result"></div>
+        <div id="mood-history"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Spotify API</h2>
+        <button id="test-profile-btn">Get My Profile</button>
+        <button id="test-recently-played-btn">Get Recently Played</button>
+        <button id="test-currently-playing-btn">Get Currently Playing</button>
+
+        <div id="api-result"></div>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    document.getElementById('onboarding-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const msg = document.getElementById('onboarding-message');
+      msg.innerHTML = 'Submitting...';
+
+      try {
+        const res = await fetch('/api/request-access', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value
+          })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          msg.innerHTML = '<p class="success">Request submitted!</p>';
+          document.getElementById('onboarding-form').reset();
+        } else {
+          msg.innerHTML = '<p class="error">' + data.error + '</p>';
+        }
+      } catch (error) {
+        msg.innerHTML = '<p class="error">Error: ' + error.message + '</p>';
+      }
+    });
+
+    // Check if user is logged in
+    async function checkAuthStatus() {
+      try {
+        const response = await fetch('/api/auth-status');
+        const data = await response.json();
+
+        if (data.isLoggedIn) {
+          document.getElementById('login-section').style.display = 'none';
+          document.getElementById('logged-in-section').style.display = 'block';
+          document.getElementById('mood-section').style.display = 'block';
+          document.getElementById('logout-btn').style.display = 'block';
+          document.getElementById('user-info').textContent = '✓ You are logged in! User ID: ' + data.userId;
+
+          loadTodaysMood();     // Auto-load today's mood
+        } else {
+          document.getElementById('login-section').style.display = 'block';
+          document.getElementById('logged-in-section').style.display = 'none';
+          document.getElementById('mood-section').style.display = 'none';
+          document.getElementById('logout-btn').style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+      }
+    }
+
+    // Check auth status on page load
+    checkAuthStatus();
+
+    // Login button handler
+    document.getElementById('spotify-login-btn').addEventListener('click', function() {
+      window.location.href = '/login';
+    });
+
+    // Logout button handler
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      window.location.href = '/logout';
+    });
+
+    // Refresh mood button handler
+    document.getElementById('refresh-mood-btn').addEventListener('click', function() {
+      analyzeMood();
+    });
+
+    // Test API button handlers
+    document.getElementById('test-profile-btn').addEventListener('click', function() {
+      testAPI('/api/me');
+    });
+    document.getElementById('test-recently-played-btn').addEventListener('click', function() {
+      testAPI('/api/recently-played');
+    });
+    document.getElementById('test-currently-playing-btn').addEventListener('click', function() {
+      testAPI('/api/currently-playing');
+    });
+  </script>
+</body>
+</html>
