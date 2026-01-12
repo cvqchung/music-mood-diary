@@ -61,8 +61,11 @@ app.use(session({
         secure: config.env === 'production',  // HTTPS only in prod
         httpOnly: true,                        // Prevent XSS attacks
         sameSite: 'lax',                       // CSRF protection
-        maxAge: 24 * 60 * 60 * 1000           // 24 hours
-    }
+        maxAge: 24 * 60 * 60 * 1000,          // 24 hours
+        path: '/'                              // Ensure cookie is available on all paths
+    },
+    name: 'sessionId',                         // Custom session cookie name
+    proxy: config.env === 'production'         // Trust first proxy (required for Render)
 }));
 
 // Health check endpoint
