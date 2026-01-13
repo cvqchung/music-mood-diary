@@ -24,6 +24,7 @@ const { SPOTIFY_TRACKS_LIMIT } = require('../config/constants');
 // POST /api/analyze-mood - Analyze user's mood based on recent listening
 router.post('/analyze-mood', requireAuth, ensureDbUserId, async function(req, res) {
     const userId = req.db_user_id;
+    const timezoneOffset = req.body.timezoneOffset || 0; // Client sends timezone offset in minutes
 
     // Get recently played tracks
     spotifyApi.getRecentlyPlayed(req.session.spotify_user_id, SPOTIFY_TRACKS_LIMIT, async function(err, data) {
@@ -34,9 +35,9 @@ router.post('/analyze-mood', requireAuth, ensureDbUserId, async function(req, re
             return res.status(400).json({ error: 'No recent listening history found' });
         }
 
-        // FILTER TO TODAY'S SONGS ONLY
-        const todaysSongs = filterToToday(data.items);
-        const today = getTodayDate();
+        // FILTER TO TODAY'S SONGS ONLY (in user's timezone)
+        const todaysSongs = filterToToday(data.items, timezoneOffset);
+        const today = getTodayDate(timezoneOffset);
 
         // CHECK IF TODAY HAS ALREADY BEEN ANALYZED
         getDailyMoodAnalysis(userId, today, async function(err, existingAnalysis) {
@@ -46,7 +47,7 @@ router.post('/analyze-mood', requireAuth, ensureDbUserId, async function(req, re
 
             // Handle no songs played today
             if (todaysSongs.length === 0) {
-                return handleNoSongsToday(data.items, userId, existingAnalysis, today, res);
+                return handleNoSongsToday(data.items, userId, existingAnalysis, today, timezoneOffset, res);
             }
 
             // Extract current track IDs
@@ -68,18 +69,17 @@ router.post('/analyze-mood', requireAuth, ensureDbUserId, async function(req, re
 router.post('/analyze-mood-date', requireAuth, ensureDbUserId, async function(req, res) {
     const targetDate = req.body.date;
     const userId = req.db_user_id;
+    const timezoneOffset = req.body.timezoneOffset || 0; // Client sends timezone offset in minutes
 
     // Validate date format
     if (!targetDate || !/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) {
         return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
     }
 
-    // Validate date is not in the future
-    const requestedDate = new Date(targetDate + 'T00:00:00');
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
+    // Validate date is not in the future (in user's timezone)
+    const todayInUserTz = getTodayDate(timezoneOffset);
 
-    if (requestedDate > today) {
+    if (targetDate > todayInUserTz) {
         return res.status(400).json({ error: 'Cannot analyze future dates' });
     }
 
@@ -92,8 +92,8 @@ router.post('/analyze-mood-date', requireAuth, ensureDbUserId, async function(re
             return res.status(400).json({ error: 'No recent listening history found' });
         }
 
-        // FILTER TO TARGET DATE ONLY
-        const dateSongs = filterToDate(data.items, targetDate);
+        // FILTER TO TARGET DATE ONLY (in user's timezone)
+        const dateSongs = filterToDate(data.items, targetDate, timezoneOffset);
         if (dateSongs.length === 0) {
             return res.status(400).json({ error: `No songs found for ${targetDate}` });
         }

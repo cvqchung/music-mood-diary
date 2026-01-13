@@ -15,10 +15,12 @@ var params = getHashParams();
 if (params.success) {
 	// Clear the hash immediately to prevent loops
 	window.location.hash = '';
-	// Show success message briefly then reload to update auth state
+	// Show success message briefly
 	document.getElementById('message').innerHTML = '<p class="success">Authentication successful! Loading your mood diary...</p>';
+	// Check auth status instead of reloading
 	setTimeout(function() {
-		window.location.href = '/';
+		checkAuthStatus();
+		document.getElementById('message').innerHTML = '';
 	}, 1000);
 } else if (params.error) {
 	document.getElementById('message').innerHTML = '<p class="error">Error: ' + params.error + '</p>';
@@ -235,9 +237,13 @@ async function analyzeMood() {
 	showTodayLoadingPlaceholder(today);
 
 	try {
+		// Get user's timezone offset in minutes
+		const timezoneOffset = -new Date().getTimezoneOffset();
+
 		const response = await fetch('/api/analyze-mood', {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ timezoneOffset: timezoneOffset })
 		});
 
 		const data = await response.json();
@@ -344,10 +350,13 @@ async function analyzeRecentDay(date) {
 	resultDiv.style.display = 'none';
 
 	try {
+		// Get user's timezone offset in minutes
+		const timezoneOffset = -new Date().getTimezoneOffset();
+
 		const response = await fetch('/api/analyze-mood-date', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ date: date })
+			body: JSON.stringify({ date: date, timezoneOffset: timezoneOffset })
 		});
 
 		const data = await response.json();

@@ -4,45 +4,53 @@
  */
 
 /**
- * Convert a Date object to YYYY-MM-DD string (local timezone)
+ * Convert a Date object to YYYY-MM-DD string in a specific timezone
  * @param {Date} date - Date object to convert
+ * @param {number} timezoneOffset - Timezone offset in minutes (e.g., -480 for PST)
  * @returns {string} Date string in YYYY-MM-DD format
  */
-function toLocalDateString(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+function toLocalDateString(date, timezoneOffset = 0) {
+    // Apply timezone offset
+    const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+    const localDate = new Date(utc + (timezoneOffset * 60000));
+
+    const year = localDate.getUTCFullYear();
+    const month = String(localDate.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(localDate.getUTCDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
 
 /**
- * Get today's date in YYYY-MM-DD format (local timezone)
+ * Get today's date in YYYY-MM-DD format in a specific timezone
+ * @param {number} timezoneOffset - Timezone offset in minutes (e.g., -480 for PST)
  * @returns {string} Today's date string
  */
-function getTodayDate() {
-    return toLocalDateString(new Date());
+function getTodayDate(timezoneOffset = 0) {
+    return toLocalDateString(new Date(), timezoneOffset);
 }
 
 /**
- * Filter tracks to a specific date (local timezone)
+ * Filter tracks to a specific date in a specific timezone
  * @param {Array} tracks - Array of track objects with played_at field
  * @param {string} targetDate - Target date in YYYY-MM-DD format
+ * @param {number} timezoneOffset - Timezone offset in minutes (e.g., -480 for PST)
  * @returns {Array} Filtered tracks
  */
-function filterToDate(tracks, targetDate) {
+function filterToDate(tracks, targetDate, timezoneOffset = 0) {
     return tracks.filter(item => {
         const playedAt = new Date(item.played_at);
-        return toLocalDateString(playedAt) === targetDate;
+        return toLocalDateString(playedAt, timezoneOffset) === targetDate;
     });
 }
 
 /**
- * Filter tracks to today only (local timezone)
+ * Filter tracks to today only in a specific timezone
  * @param {Array} tracks - Array of track objects with played_at field
+ * @param {number} timezoneOffset - Timezone offset in minutes (e.g., -480 for PST)
  * @returns {Array} Filtered tracks for today
  */
-function filterToToday(tracks) {
-    return filterToDate(tracks, getTodayDate());
+function filterToToday(tracks, timezoneOffset = 0) {
+    return filterToDate(tracks, getTodayDate(timezoneOffset), timezoneOffset);
 }
 
 /**

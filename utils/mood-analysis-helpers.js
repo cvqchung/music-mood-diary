@@ -118,7 +118,7 @@ async function analyzeAndSaveMood(userId, date, songs, existingAnalysis, isCompl
  * Handle the case when no songs were played today
  * Suggests the most recent day with listening if available
  */
-function handleNoSongsToday(allRecentTracks, userId, existingAnalysis, today, res) {
+function handleNoSongsToday(allRecentTracks, userId, existingAnalysis, today, timezoneOffset, res) {
     // If we have existing analysis for today, return it
     if (existingAnalysis) {
         const lastAnalyzedIds = new Set(existingAnalysis.analyzed_track_ids || []);
@@ -136,11 +136,11 @@ function handleNoSongsToday(allRecentTracks, userId, existingAnalysis, today, re
         });
     }
 
-    // Find the most recent date with songs
+    // Find the most recent date with songs (in user's timezone)
     if (allRecentTracks.length > 0) {
         const mostRecentTrack = new Date(allRecentTracks[0].played_at);
-        const mostRecentDate = toLocalDateString(mostRecentTrack);
-        const recentDaySongs = filterToDate(allRecentTracks, mostRecentDate);
+        const mostRecentDate = toLocalDateString(mostRecentTrack, timezoneOffset);
+        const recentDaySongs = filterToDate(allRecentTracks, mostRecentDate, timezoneOffset);
 
         // Check if this date already has an analysis
         getDailyMoodAnalysis(userId, mostRecentDate, function(err, recentAnalysis) {
