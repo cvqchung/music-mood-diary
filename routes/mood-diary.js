@@ -126,15 +126,10 @@ router.get('/mood-history', requireAuth, ensureDbUserId, function(req, res) {
     const limit = req.query.limit ? parseInt(req.query.limit) : 30;
     const userId = req.db_user_id;
 
-    console.log('Fetching mood history for user ID:', userId, 'limit:', limit);
-
     getAllDailyMoodAnalyses(userId, limit, function(err, analyses) {
         if (err) {
-            console.error('Error fetching mood history:', err);
             return res.status(500).json({ error: 'Failed to fetch mood history' });
         }
-
-        console.log('Found', analyses.length, 'mood analyses for user', userId);
 
         // Add track_count to each analysis and format dates
         const analysesWithCount = analyses.map(analysis => {
@@ -152,7 +147,8 @@ router.get('/mood-history', requireAuth, ensureDbUserId, function(req, res) {
 
 // GET /api/mood-today - Get today's mood analysis
 router.get('/mood-today', requireAuth, ensureDbUserId, function(req, res) {
-    const today = getTodayDate();
+    const timezoneOffset = req.query.timezoneOffset ? parseInt(req.query.timezoneOffset) : 0;
+    const today = getTodayDate(timezoneOffset);
     const userId = req.db_user_id;
 
     getDailyMoodAnalysis(userId, today, function(err, analysis) {

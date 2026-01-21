@@ -76,7 +76,7 @@ app.get('/health', (_req, res) => {
 // Mount routes
 app.use('/', authRoutes);           // Auth routes (/login, /callback, /refresh_token)
 app.use('/api', moodDiaryRoutes);   // Mood diary API routes
-app.use('/', onboardingRoutes);     // Onboarding routes (/api/request-access, /admin/onboarding-requests)
+app.use('/', onboardingRoutes);     // Onboarding routes (/api/request-access)
 
 // Global error handler
 app.use((err, _req, res, _next) => {

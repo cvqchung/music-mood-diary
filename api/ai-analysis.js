@@ -86,10 +86,10 @@ async function analyzeMoodWithAI(tracks, previousAnalysis = null, newTracks = []
         sampleTracks = heavyRotation.slice(0, SAMPLE_TRACKS_COUNT).map(s => {
             const trackData = tracks.find(t => t.track.name === s.name && t.track.artists[0].name === s.artist);
             return {
-            track_name: s.name,
-            artist: s.artist,
-            play_count: s.count,
-            album_art_url: trackData?.track.album.images[0]?.url
+                track_name: s.name,
+                artist: s.artist,
+                play_count: s.count,
+                album_art_url: trackData?.track.album.images[0]?.url
             };
         });
         }

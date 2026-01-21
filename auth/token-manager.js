@@ -47,30 +47,30 @@ function refreshAccessToken(refreshToken, callback) {
 function getValidAccessToken(spotifyUserId, callback) {
     getUserTokens(spotifyUserId, function(err, user) {
         if (err || !user) {
-        return callback(new Error('User not found'));
+            return callback(new Error('User not found'));
         }
 
         // Check if token is expired
         if (isTokenExpired(user.token_expiry)) {
-        // Refresh the token
-        refreshAccessToken(user.refresh_token, function(err, tokens) {
-            if (err) {
-                return callback(err);
-            }
+            // Refresh the token
+            refreshAccessToken(user.refresh_token, function(err, tokens) {
+                if (err) {
+                    return callback(err);
+                }
 
-            // Update database with new access token
-            updateAccessToken(spotifyUserId, tokens.access_token, tokens.expires_in, function(err) {
-            if (err) {
-                return callback(err);
-            }
+                // Update database with new access token
+                updateAccessToken(spotifyUserId, tokens.access_token, tokens.expires_in, function(err) {
+                if (err) {
+                    return callback(err);
+                }
 
-            callback(null, tokens.access_token);
+                callback(null, tokens.access_token);
+                });
             });
-        });
-    } else {
-      // Token still valid, return it
-      callback(null, user.access_token);
-    }
+        } else {
+        // Token still valid, return it
+        callback(null, user.access_token);
+        }
   });
 }
 

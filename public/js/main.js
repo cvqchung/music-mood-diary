@@ -179,7 +179,8 @@ async function loadTodaysMood() {
 
 	try {
 		// Try to get today's existing analysis first
-		const response = await fetch('/api/mood-today');
+		const timezoneOffset = -new Date().getTimezoneOffset();
+		const response = await fetch('/api/mood-today?timezoneOffset=' + timezoneOffset);
 		const data = await response.json();
 
 		if (data.exists) {
