@@ -6,6 +6,8 @@ Built with Node.js · Express · PostgreSQL · Claude API
 
 **Built by:** Cynthia Chung · [LinkedIn](https://www.linkedin.com/in/cvqchung) · cynthiacgq@gmail.com
 
+---
+
 ## Live Demo
 
 **🚀 Try it here:** [music-mood-diary.onrender.com](https://music-mood-diary.onrender.com)
