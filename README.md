@@ -4,18 +4,18 @@ Track your mood through music. A web app that analyzes your Spotify listening hi
 
 Built with Node.js · Express · PostgreSQL · Claude API
 
-**Built by [Cynthia Chung](https://linkedin.com/in/cvqchung)** · cynthiacgq@gmail.com
+**Built by:** Cynthia Chung · [LinkedIn](https://www.linkedin.com/in/cvqchung) · cynthiacgq@gmail.com
 
 ## Live Demo
 
-🚀 **[View Live Application](https://music-mood-diary.onrender.com)**
+**🚀 Try it here:** [music-mood-diary.onrender.com](https://music-mood-diary.onrender.com)
 
 > **Note:** Due to Spotify's Development Mode restrictions, the app requires manual user authorization. Request demo access in the form on the website.
 
-### Demo Screenshots
-
 <img width="400" alt="Screenshot 2026-01-20 at 4 48 26 PM" src="https://github.com/user-attachments/assets/6810773c-81da-4fb6-933a-c4954b9a6940" />
 <img width="400" alt="Screenshot 2026-01-09 at 2 22 08 PM" src="https://github.com/user-attachments/assets/6d0410bd-1b24-4646-9346-094be4c2c0d1" />
+
+---
 
 ## Features
 
@@ -24,6 +24,8 @@ Built with Node.js · Express · PostgreSQL · Claude API
 - **History View**: Browse past analyses with mood-based gradient backgrounds
 - **Smart Updates**: Refreshes analysis only when you've listened to enough new music
 - **Spotify OAuth Integration**: Secure authentication with automatic token refresh
+
+---
 
 ## Tech Stack
 
@@ -44,6 +46,7 @@ Built with Node.js · Express · PostgreSQL · Claude API
 
 **License:** MIT
 
+---
 
 ## Technical Highlights
 
@@ -64,6 +67,8 @@ Built with Node.js · Express · PostgreSQL · Claude API
 - Tracks which songs were analyzed to detect new listening activity
 - Updates show evolution from previous analysis (e.g., "shifted from upbeat to mellow")
 
+---
+
 ## Development Journey
 
 ### Key Challenges Solved
@@ -80,13 +85,17 @@ Built with Node.js · Express · PostgreSQL · Claude API
 - Session security (httpOnly cookies, CSRF protection)
 - Production deployment on Render (proxy headers, session store)
 
+---
+
 ## Known Limitations
 
 - **Spotify Development Mode**: Max 25 authorized users (API restriction)
 - **Recently Played API**: Limited to last 50 tracks (~24 hours of listening)
 - **AI Analysis**: Daily limits depend on Anthropic API tier
 - **Date Range**: Can only analyze recent listening history
+- Due to Render's free tier limitations, the first load may have a cold start delay
 
+---
 
 ## Future Enhancements
 
@@ -145,7 +154,7 @@ music-mood-diary/
 └── server.js         # Express app entry point
 ```
 <details>
-<summary><h3>API Documentation</h3></summary>
+<summary><strong>API Documentation</strong></summary>
 
 #### Authentication Endpoints
 - `GET /login` - Initiate Spotify OAuth flow
@@ -171,7 +180,7 @@ music-mood-diary/
 </details>
 
 <details>
-<summary><h3>Database Schema</h3></summary>
+<summary><strong>Database Schema</strong></summary>
 
 #### `users` : Stores user authentication tokens
 - `id` - Primary key

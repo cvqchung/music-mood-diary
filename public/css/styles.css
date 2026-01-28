@@ -5,6 +5,14 @@ body {
   padding: 20px;
 }
 
+a {
+  color: #1DB954;
+}
+
+a:hover {
+  color: #1ed760;
+}
+
 .success {
   background: #d4edda;
   color: #155724;
